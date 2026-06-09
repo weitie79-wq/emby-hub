@@ -1,9 +1,9 @@
 version: '3.8'
 
 services:
-  postgres:
+  db:
     image: postgres:15
-    restart: unless-stopped
+    restart: always
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -15,35 +15,22 @@ services:
 
   redis:
     image: redis:7-alpine
-    restart: unless-stopped
+    restart: always
     networks:
       - emby-net
 
-  backend:
-    build: ./backend
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-    volumes:
-      - ./backend:/app
+  app:
+    build: .
+    restart: always
+    ports:
+      - "8000:8000"
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - REDIS_URL=${REDIS_URL}
       - SECRET_KEY=${SECRET_KEY}
     depends_on:
-      - postgres
+      - db
       - redis
-    ports:
-      - "8000:8000"
-    networks:
-      - emby-net
-
-  frontend:
-    build: ./frontend
-    volumes:
-      - ./frontend:/app
-    ports:
-      - "3000:3000"
-    environment:
-      - VITE_API_BASE_URL=${VITE_API_BASE_URL}
     networks:
       - emby-net
 
