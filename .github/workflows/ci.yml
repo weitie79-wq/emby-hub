@@ -1,0 +1,25 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install backend deps
+        run: |
+          pip install -r backend/requirements.txt
+      - name: Lint backend (placeholder)
+        run: echo "Run lint/tests here"
+      - name: Build frontend
+        uses: bahmutov/npm-install@v1
+        with:
+          working-directory: ./frontend
+      - name: Frontend build
+        run: npm run build
+        working-directory: ./frontend
